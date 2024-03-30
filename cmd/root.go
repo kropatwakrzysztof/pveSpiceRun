@@ -15,7 +15,6 @@ var (
 	Version   string = "dev"
 	Commit    string = "---"
 	BuildDate string = "---"
-	BuiltBy   string = "---"
 )
 
 var (
@@ -33,14 +32,14 @@ var (
 var rootCmd = &cobra.Command{
 	Use:     "pveSpiceRun",
 	Short:   "Simple client to start vm/lxc on proxmox and attach Spice console",
-	Long:    ``,
+	Long:    fmt.Sprintf("Simple client to start vm/lxc on proxmox and attach Spice console\nVersion: %s compiled on: %s from commit: %s", Version, BuildDate, Commit),
 	Run:     rootCommandExecute,
 	Version: Version,
 }
 
 func Execute() {
 
-	rootCmd.SetVersionTemplate(fmt.Sprintf("Version: %s build on: %s\nCommit: %s build by: %s\n", Version, BuildDate, Commit, BuiltBy))
+	rootCmd.SetVersionTemplate(Version)
 
 	err := rootCmd.Execute()
 	if err != nil {
