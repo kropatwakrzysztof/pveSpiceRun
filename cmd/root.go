@@ -50,23 +50,23 @@ func Execute() {
 func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&address, "address", "a", "", "host address")
-	rootCmd.MarkFlagRequired("address")
+	rootCmd.MarkPersistentFlagRequired("address")
 
 	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 0, "host port")
 
 	rootCmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", "", "spice proxy, if not provided then equals \"address\"")
 
 	rootCmd.PersistentFlags().StringVarP(&vmid, "vmid", "i", "", "VM/LXC ID")
-	rootCmd.MarkFlagRequired("vmid")
+	rootCmd.MarkPersistentFlagRequired("vmid")
 
 	rootCmd.PersistentFlags().StringVarP(&username, "username", "u", "", "username")
-	rootCmd.MarkFlagRequired("username")
+	rootCmd.MarkPersistentFlagRequired("username")
 
 	rootCmd.PersistentFlags().StringVarP(&token, "token", "t", "", "token")
-	rootCmd.MarkFlagRequired("token")
+	rootCmd.MarkPersistentFlagRequired("token")
 
 	rootCmd.PersistentFlags().StringVarP(&secret, "secret", "s", "", "secret")
-	rootCmd.MarkFlagRequired("secret")
+	rootCmd.MarkPersistentFlagRequired("secret")
 
 	default_virtviewer_path := "/usr/bin/remote-viewer"
 	os := runtime.GOOS
