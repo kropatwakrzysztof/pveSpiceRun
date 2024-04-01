@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"pveSpiceRun/internal"
 	"runtime"
 
 	"github.com/spf13/cobra"
@@ -19,13 +20,13 @@ var (
 
 var (
 	address     string
-	port        int
 	proxy       string
-	vmid        string
+	vmid        int
 	username    string
 	token       string
 	secret      string
 	viewer_path string
+	insecure    bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -43,6 +44,7 @@ func Execute() {
 
 	err := rootCmd.Execute()
 	if err != nil {
+		fmt.Print(err)
 		os.Exit(1)
 	}
 }
@@ -52,11 +54,11 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&address, "address", "a", "", "host address")
 	rootCmd.MarkPersistentFlagRequired("address")
 
-	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 0, "host port")
+	rootCmd.PersistentFlags().StringVarP(&proxy, "proxy", "p", "", "spice proxy, if not provided then equals \"address\"")
 
-	rootCmd.PersistentFlags().StringVarP(&proxy, "proxy", "x", "", "spice proxy, if not provided then equals \"address\"")
+	rootCmd.PersistentFlags().BoolVarP(&insecure, "insecure", "", false, "do not verify ssl certificate")
 
-	rootCmd.PersistentFlags().StringVarP(&vmid, "vmid", "i", "", "VM/LXC ID")
+	rootCmd.PersistentFlags().IntVarP(&vmid, "vmid", "i", 0, "VM/LXC ID")
 	rootCmd.MarkPersistentFlagRequired("vmid")
 
 	rootCmd.PersistentFlags().StringVarP(&username, "username", "u", "", "username")
@@ -77,14 +79,9 @@ func init() {
 }
 
 func rootCommandExecute(cmd *cobra.Command, args []string) {
-
-	// authHeader := map[string]string{"Authorization": "PVEAPIToken=" + username + "!" + token + "=" + secret}
-	// apiUrl := "https://" + address + "/api2/json"
-	// if port != 0 {
-	// 	apiUrl = "https://" + address + ":" + strconv.Itoa(port) + "/api2/json"
-	// }
-	// if proxy == "" {
-	// 	proxy = address
-	// }
-
+	err := internal.ConnectSpiceTarget(address, proxy, insecure, vmid, username, token, secret, viewer_path)
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
 }
