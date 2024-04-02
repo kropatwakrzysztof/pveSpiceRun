@@ -13,7 +13,7 @@ type ResponseData struct {
 	Data interface{} `json:"data"`
 }
 
-func sendApiRequest(url string, method string, headers map[string]string, data []byte, insecure bool) (map[string]interface{}, error) {
+func sendApiRequest(method string, url string, headers map[string]string, data []byte, insecure bool) (map[string]interface{}, error) {
 
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(data))
 	if err != nil {

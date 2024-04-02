@@ -40,7 +40,7 @@ func TestGetRequest(t *testing.T) {
 		"Authorization": "token",
 	}
 
-	_, err := sendApiRequest(server.URL, "GET", heders, nil, true)
+	_, err := sendApiRequest("GET", server.URL, heders, nil, true)
 	if err != nil {
 		t.Fatalf("Get failed with error\n%s", err)
 	}

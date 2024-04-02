@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -54,7 +55,46 @@ func TestMakeProxyAddress(t *testing.T) {
 	}
 }
 
-func TestNoAuthentication(t *testing.T) {
+func TestEnsureAuthentication(t *testing.T) {
+
+	tests := map[string]struct {
+		serverStatus  int
+		expectedError error
+	}{
+		"success": {serverStatus: http.StatusOK, expectedError: nil},
+		"no auth": {serverStatus: http.StatusUnauthorized, expectedError: fmt.Errorf("401 Unauthorized")},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path != "/access/permissions" {
+					t.Fatalf("Expected to request '/access/permissions', got: %s", r.URL.Path)
+				}
+				w.WriteHeader(tc.serverStatus)
+			}))
+			defer server.Close()
+
+			authHeader := map[string]string{
+				"Authorization": "PVEAPIToken=user!token=secret",
+			}
+
+			// Call the application code
+			err := ensureAuthenticated(server.URL, authHeader, true)
+			if tc.expectedError == nil && err != nil {
+				t.Fatalf("Expected no error got \"%s\"", err)
+			}
+			if tc.expectedError != nil && err == nil {
+				t.Fatalf("Expected error \"%s\" got no error", tc.expectedError)
+			}
+			if tc.expectedError != nil && err != nil && err.Error() != tc.expectedError.Error() {
+				t.Fatalf("Expected error \"%s\" got \"%s\"", tc.expectedError, err)
+			}
+		})
+	}
+}
+
+func TestConnectSpiceTarget(t *testing.T) {
 	// Prepare mock setup
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api2/json/access/permissions" {
